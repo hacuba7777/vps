@@ -55,16 +55,16 @@ jobs:
         run: scp docker-compose.yml Caddyfile ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/app/
 
       - name: Deploy on EC2
-        env:
-          GHCR_USER: ${{ secrets.GHCR_USER }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}  # read:packages 的 PAT（image 若 public 可把 login 省掉）
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash -lc '
-            set -e
-            cd /opt/app
-            docker login ghcr.io -u "$GHCR_USER" -p "$GHCR_TOKEN" || true
-            docker-compose pull
-            docker-compose up -d
-            sleep 2
-            curl -fsS http://localhost/healthz >/dev/null && echo "healthy" || (docker logs --tail=200 app; exit 1)
-          '
+            ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            GHCR_USER='${{ secrets.GHCR_USER }}' GHCR_TOKEN='${{ secrets.GHCR_TOKEN }}' bash -lc '
+                set -e
+                cd /opt/app
+                docker login ghcr.io -u \"$GHCR_USER\" -p \"$GHCR_TOKEN\" || true
+                docker compose pull || docker-compose pull
+                docker compose up -d || docker-compose up -d
+                sleep 2
+                curl -fsS http://localhost/healthz >/dev/null && echo healthy || (docker logs --tail=200 app; exit 1)
+            '
+            "
+
