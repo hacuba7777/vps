@@ -68,11 +68,18 @@ jobs:
                 docker login ghcr.io -u \"$GHCR_USER\" -p \"$GHCR_TOKEN\" || true
                 docker-compose pull
                 docker-compose up -d
-                # 用 GET 檢查，避免 308/405
-                curl -fsS https://app.hacuba.site/healthz >/dev/null
-                echo healthy
             '
             "
+      - name: Health check with retry
+        run: |
+            for i in {1..20}; do
+            if curl -fsS https://app.hacuba.site/healthz >/dev/null; then
+                echo "healthy"; exit 0
+            fi
+            echo "waiting for app... ($i)"; sleep 3
+            done
+            echo "app not ready in time"; exit 1
+
 
 
 
