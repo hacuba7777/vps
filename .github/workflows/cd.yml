@@ -24,7 +24,12 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build image
-        run: docker build -t $IMAGE:$TAG -t $IMAGE:$LATEST .
+        run: |
+            docker build \
+            --build-arg GIT_SHA=${{ github.sha }} \
+            --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+            --build-arg APP_NAME=${{ github.repository }} \
+            -t $IMAGE:$TAG -t $IMAGE:$LATEST .
 
       - name: Push image
         run: |
@@ -67,4 +72,7 @@ jobs:
                 curl -fsS http://localhost/healthz >/dev/null && echo healthy || (docker logs --tail=200 app; exit 1)
             '
             "
+      - name: Health check
+        run: curl -fsS https://app.hacuba.site/healthz >/devnull
+
 
