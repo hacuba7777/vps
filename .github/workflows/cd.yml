@@ -63,8 +63,8 @@ jobs:
             set -e
             cd /opt/app
             docker login ghcr.io -u "$GHCR_USER" -p "$GHCR_TOKEN" || true
-            docker compose pull || docker-compose pull
-            docker compose up -d || docker-compose up -d
+            docker-compose pull
+            docker-compose up -d
             sleep 2
             curl -fsS http://localhost/healthz >/dev/null && echo "healthy" || (docker logs --tail=200 app; exit 1)
           '
