@@ -1,5 +1,26 @@
 services:
   app:
-    build: .
+    image: ghcr.io/<owner>/<repo>:latest      # 全小寫
+    restart: unless-stopped
+    expose:
+      - "8000"
+    networks: [web]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro   # 用你從 repo 同步過去的檔案
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [web]
+
+networks:
+  web:
+
+volumes:
+  caddy_data:
+  caddy_config:
