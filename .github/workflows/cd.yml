@@ -1,0 +1,31 @@
+name: Build & Push to GHCR
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  TAG: ${{ github.sha }}
+  LATEST: latest
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build image
+        run: docker build -t $IMAGE:$TAG -t $IMAGE:$LATEST .
+
+      - name: Push image
+        run: |
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:$LATEST
