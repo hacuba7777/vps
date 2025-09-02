@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/<owner>/<repo>:latest      # 全小寫
+    image: ghcr.io/hacuba7777/vps:latest      # 全小寫
     restart: unless-stopped
     expose:
       - "8000"
