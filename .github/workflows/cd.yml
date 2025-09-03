@@ -38,6 +38,7 @@ jobs:
 
   deploy:
     needs: build-and-push
+    environment: prod
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (get Caddyfile & compose)
