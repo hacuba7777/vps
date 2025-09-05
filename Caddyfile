@@ -1,4 +1,19 @@
 app.hacuba.site {
-  reverse_proxy app:8000
-  encode gzip zstd
+	@health path /healthz
+	handle @health {
+		respond "ok" 200
+	}
+
+	# Prometheus UI
+	handle_path /prometheus/* {
+		reverse_proxy prometheus:9090
+	}
+
+	# Alertmanager UI
+	handle_path /alertmanager/* {
+		reverse_proxy alertmanager:9093
+	}
+
+	# 其他流量給 app
+	reverse_proxy app:8000
 }

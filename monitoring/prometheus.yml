@@ -12,10 +12,10 @@ rule_files:
 
 scrape_configs:
   # 你的應用（請按你的實際位置改 host:port）
-  - job_name: "myapp"
+  - job_name: "app"
     static_configs:
       - targets:
-          - "localhost:8000" # Mac/Windows Docker：抓本機 8000
+          - "app:8000" # Mac/Windows Docker：抓本機 8000
           # 或 "app:8000" 如果你的 app 也在 compose network 裡
     metrics_path: /metrics
 
