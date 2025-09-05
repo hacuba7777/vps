@@ -66,8 +66,14 @@ jobs:
           GHCR_USER='${{ secrets.GHCR_USER }}' GHCR_TOKEN='${{ secrets.GHCR_TOKEN }}' bash -lc '
               set -e
               cd /opt/app
+              
+              cat > .env <<EOF
+              GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
+              ENVIRONMENT=prod
+              EOF
+              chmod 600 .env
+
               docker login ghcr.io -u \"$GHCR_USER\" -p \"$GHCR_TOKEN\" || true
-              # ⬅️ 同時啟動 app.yml 與 monitor.yml
               docker-compose -f docker-compose.yml -f docker-compose.monitor.yml pull
               docker-compose -f docker-compose.yml -f docker-compose.monitor.yml up -d
           '

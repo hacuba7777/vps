@@ -22,4 +22,9 @@ services:
     volumes:
       - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     environment:
-      -GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
+      ENVIRONMENT: prod
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--config.expand-env=true"
+      - "--log.level=info"
