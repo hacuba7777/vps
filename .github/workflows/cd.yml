@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # 讓 GITHUB_TOKEN 可以 push 到 GHCR
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,11 +25,11 @@ jobs:
 
       - name: Build image
         run: |
-            docker build \
-            --build-arg GIT_SHA=${{ github.sha }} \
-            --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
-            --build-arg APP_NAME=${{ github.repository }} \
-            -t $IMAGE:$TAG -t $IMAGE:$LATEST .
+          docker build \
+          --build-arg GIT_SHA=${{ github.sha }} \
+          --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+          --build-arg APP_NAME=${{ github.repository }} \
+          -t $IMAGE:$TAG -t $IMAGE:$LATEST .
 
       - name: Push image
         run: |
@@ -57,31 +57,28 @@ jobs:
       - name: Prepare /opt/app on EC2
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /opt/app"
 
-      - name: Copy deploy files
-        run: scp docker-compose.yml Caddyfile ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/app/
+      - name: Copy deploy files   # ⬅️ 多加 docker-compose.monitor.yml
+        run: scp docker-compose.yml docker-compose.monitor.yml Caddyfile ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/app/
 
       - name: Deploy on EC2
         run: |
-            ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            GHCR_USER='${{ secrets.GHCR_USER }}' GHCR_TOKEN='${{ secrets.GHCR_TOKEN }}' bash -lc '
-                set -e
-                cd /opt/app
-                docker login ghcr.io -u \"$GHCR_USER\" -p \"$GHCR_TOKEN\" || true
-                docker-compose pull
-                docker-compose up -d
-            '
-            "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+          GHCR_USER='${{ secrets.GHCR_USER }}' GHCR_TOKEN='${{ secrets.GHCR_TOKEN }}' bash -lc '
+              set -e
+              cd /opt/app
+              docker login ghcr.io -u \"$GHCR_USER\" -p \"$GHCR_TOKEN\" || true
+              # ⬅️ 同時啟動 app.yml 與 monitor.yml
+              docker-compose -f docker-compose.yml -f docker-compose.monitor.yml pull
+              docker-compose -f docker-compose.yml -f docker-compose.monitor.yml up -d
+          '
+          "
+
       - name: Health check with retry
         run: |
-            for i in {1..20}; do
+          for i in {1..20}; do
             if curl -fsS https://app.hacuba.site/healthz >/dev/null; then
-                echo "healthy"; exit 0
+              echo "healthy"; exit 0
             fi
             echo "waiting for app... ($i)"; sleep 3
-            done
-            echo "app not ready in time"; exit 1
-
-
-
-
-
+          done
+          echo "app not ready in time"; exit 1
