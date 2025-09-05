@@ -23,3 +23,7 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["prometheus:9090"]
+  # 測試用的假目標
+  - job_name: "fake"
+    static_configs:
+      - targets: ["127.0.0.1:9999"]
