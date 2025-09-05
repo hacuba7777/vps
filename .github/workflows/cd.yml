@@ -68,9 +68,9 @@ jobs:
               cd /opt/app
               
               cat > .env <<EOF
-              GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
-              ENVIRONMENT=prod
-              EOF
+          GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
+          ENVIRONMENT=prod
+          EOF
               chmod 600 .env
 
               docker login ghcr.io -u \"$GHCR_USER\" -p \"$GHCR_TOKEN\" || true
