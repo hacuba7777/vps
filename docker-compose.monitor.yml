@@ -27,9 +27,8 @@ services:
       ENVIRONMENT: prod
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
-      - "--config.expand-env=true"
       - "--log.level=info"
     networks: [web]
-    
+
 networks:
   web: {}   # 與主 compose 的 web 同名即可，Compose 會合併
