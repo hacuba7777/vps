@@ -1,0 +1,21 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'hacuba7777@gmail.com'          # 建議跟下面 username 同一個
+  smtp_require_tls: true
+  smtp_auth_username: 'hacuba7777@gmail.com'
+  smtp_auth_password: ${GMAIL_APP_PASSWORD}        # 不是登入密碼
+
+route:
+  receiver: 'email'
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 30m
+
+receivers:
+  - name: 'email'
+    email_configs:
+      - to: 'hacuba7777+am@gmail.com'
+        send_resolved: true
+        headers:
+          Subject: '[AM] {{ .CommonLabels.alertname }} - {{ .Status | toUpper }}'

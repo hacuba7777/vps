@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml
+
+scrape_configs:
+  # 你的應用（請按你的實際位置改 host:port）
+  - job_name: "myapp"
+    static_configs:
+      - targets:
+          - "localhost:8000" # Mac/Windows Docker：抓本機 8000
+          # 或 "app:8000" 如果你的 app 也在 compose network 裡
+    metrics_path: /metrics
+
+  # 監控自己（Prometheus）
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["prometheus:9090"]

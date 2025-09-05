@@ -1,0 +1,26 @@
+groups:
+  - name: core-alerts
+    rules:
+      # 服務抓不到（ex: app 掛了 / 網路斷）
+      - alert: InstanceDown
+        expr: up == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Target is down: {{ $labels.job }} {{ $labels.instance }}"
+          description: "Prometheus cannot scrape {{ $labels.instance }} (job={{ $labels.job }}) for 2m."
+
+      # P95 延遲 > 0.8 秒，持續 5 分鐘
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(http_request_latency_seconds_bucket[5m])) by (le)
+          ) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 latency"
+          description: "p95 latency > 0.8s for 5m. Check upstream/downstream bottlenecks."
