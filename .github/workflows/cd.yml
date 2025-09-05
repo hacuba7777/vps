@@ -55,10 +55,10 @@ jobs:
           ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Prepare /opt/app on EC2
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /opt/app"
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /opt/app && rm -rf /opt/app/monitoring"
 
       - name: Copy deploy files   # ⬅️ 多加 docker-compose.monitor.yml
-        run: scp docker-compose.yml docker-compose.monitor.yml Caddyfile ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/app/
+        run: scp -r docker-compose.yml docker-compose.monitor.yml Caddyfile monitoring ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/app/
 
       - name: Deploy on EC2
         run: |
