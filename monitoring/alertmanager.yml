@@ -3,7 +3,7 @@ global:
   smtp_from: 'hacuba7777@gmail.com'          # 建議跟下面 username 同一個
   smtp_require_tls: true
   smtp_auth_username: 'hacuba7777@gmail.com'
-  smtp_auth_password: ${GMAIL_APP_PASSWORD}        # 不是登入密碼
+  smtp_auth_password: '${GMAIL_APP_PASSWORD}'        # 不是登入密碼
 
 route:
   receiver: 'email'
