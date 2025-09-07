@@ -15,5 +15,5 @@ app.hacuba.site {
 	}
 
 	# 其他流量給 app
-	reverse_proxy app:8000
+	reverse_proxy blue:8000
 }

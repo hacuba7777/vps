@@ -1,9 +1,28 @@
 services:
-  app:
+  blue:
     image: ghcr.io/hacuba7777/vps:latest      # 全小寫
     restart: unless-stopped
+    container_name: blue
+    environment:
+      - APP_COLOR=blue
     expose:
-      - "8000"
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:8000/healthz'); sys.exit(0)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks: [web]
+
+  green:
+    image: ghcr.io/hacuba7777/vps:latest      # 全小寫
+    restart: unless-stopped
+    container_name: green
+    environment:
+      - APP_COLOR=green
+    expose:
+      - "8002:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:8000/healthz'); sys.exit(0)"]
       interval: 10s
@@ -23,9 +42,6 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     networks: [web]
-    depends_on:
-      app:
-        condition: service_healthy
 
 networks:
   web:

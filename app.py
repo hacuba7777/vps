@@ -14,6 +14,7 @@ app = FastAPI()
 APP_NAME   = os.getenv("APP_NAME", "myapp")
 GIT_SHA    = os.getenv("GIT_SHA", "dev")[:7]
 BUILD_TIME = os.getenv("BUILD_TIME", "unknown")
+APP_COLOR = os.getenv("APP_COLOR", "unknown")
 APP_ENV    = os.getenv("APP_ENV", "prod")
 
 # ---------------- Prometheus 指標定義（零侵入，通用） ----------------
@@ -62,6 +63,7 @@ async def prometheus_middleware(request: Request, call_next):
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     host = socket.gethostname()
+    port = request.url.port or "80"
     html = f"""<!doctype html>
 <html><head><meta charset="utf-8"><title>{APP_NAME} status</title>
 <style>
@@ -71,6 +73,8 @@ def home(request: Request):
   a{{text-decoration:none}}
 </style></head>
 <body>
+<h1 style="color:{APP_COLOR}">Hello from {APP_COLOR.capitalize()}!</h1>
+      <p>Port: {port} · Host: {host}</p>
   <h1>✅ {APP_NAME} is running</h1>
   <div class="grid">
     <div>Version</div><div><code>{GIT_SHA}</code></div>
