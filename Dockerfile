@@ -15,12 +15,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # 建使用者 + 切換
 RUN useradd -m appuser
 RUN chown -R appuser:appuser /app
-
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
 COPY app.py .
+
+
+
+
 USER appuser
 EXPOSE 8000
 CMD ["sh","-c","uvicorn app:app --host 0.0.0.0 --port ${PORT} --proxy-headers --forwarded-allow-ips='*'"]

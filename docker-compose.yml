@@ -5,10 +5,10 @@ services:
     container_name: blue
     environment:
       - APP_COLOR=blue
-    expose:
+    ports:
       - "8001:8000"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:8000/healthz'); sys.exit(0)"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/healthz"]     
       interval: 10s
       timeout: 3s
       retries: 5
@@ -21,10 +21,10 @@ services:
     container_name: green
     environment:
       - APP_COLOR=green
-    expose:
+    ports:
       - "8002:8000"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:8000/healthz'); sys.exit(0)"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/healthz"]      
       interval: 10s
       timeout: 3s
       retries: 5
